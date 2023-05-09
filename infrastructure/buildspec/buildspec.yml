@@ -1,0 +1,50 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+    commands:
+      - git config --global credential.helper '!aws codecommit credential-helper $@'
+      - git config --global credential.UseHttpPath true
+      - git config --global user.name $AUTHOR_NAME
+      - git config --global user.email $AUTHOR_EMAIL
+      - git clone $REPOSITORY_URL
+      - cd $REPOSITORY_NAME
+      - npm init --y
+      - npm install husky -D
+      - npx husky install
+      - rm .husky/_/.gitignore
+  pre_build:
+    commands:
+      - touch modify-package-json.js
+      - echo "const fs = require('fs');" >> modify-package-json.js
+      - echo "const packageJsonPath = './package.json';" >> modify-package-json.js
+      - echo "const packageJson = require(packageJsonPath);" >> modify-package-json.js
+      - echo "if (!packageJson.hasOwnProperty('scripts')) {" >> modify-package-json.js
+      - echo "  packageJson.scripts = {};" >> modify-package-json.js
+      - echo "}" >> modify-package-json.js
+      - echo "packageJson.scripts['prepare'] = 'husky install && chmod +x .husky/pre-commit'" >> modify-package-json.js
+      - echo "fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));" >> modify-package-json.js
+      - node modify-package-json.js
+      - rm modify-package-json.js
+  build:
+    commands:
+      - echo '#!/bin/bash' > .husky/pre-commit
+      - echo '' >> .husky/pre-commit
+      - echo "protected_branch='main'" >> .husky/pre-commit
+      - echo $CURRENT_BRANCH >> .husky/pre-commit
+      - echo '' >> .husky/pre-commit
+      - echo 'if [ "$protected_branch" = "$current_branch" ]' >> .husky/pre-commit
+      - echo 'then' >> .husky/pre-commit
+      - echo 'echo "You cannot push to the $protected_branch branch"' >> .husky/pre-commit
+      - echo 'exit 1' >> .husky/pre-commit
+      - echo 'fi' >> .husky/pre-commit
+      - echo 'This is a CodeCommit Module that uses a CI/CD Pipeline to pre-install and push the necessary files to protect the main branch.' > readme.md
+      - echo '' >> readme.md
+      - echo 'Please run `npm install` then `npm run prepare` command in the terminal to protect the main branch.' >> readme.md
+      - git add .
+      - git commit -m "CI/CD Commit"
+  post_build:
+    commands:
+      - git push origin main
+
