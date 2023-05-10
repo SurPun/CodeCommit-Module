@@ -41,6 +41,8 @@ phases:
       - echo 'fi' >> .husky/pre-commit
       - echo 'This is a CodeCommit Module that uses a CI/CD Pipeline to pre-install and push the necessary files to protect the main branch.' > readme.md
       - echo '' >> readme.md
+      - echo '[Instructions](https://github.com/SurPun/CodeCommit-Module/blob/main/Instructions.md)' >> readme.md
+      - echo '' >> readme.md
       - echo 'Please run `npm install` then `npm run prepare` command in the terminal to protect the main branch.' >> readme.md
       - git add .
       - git commit -m "CI/CD Commit"
