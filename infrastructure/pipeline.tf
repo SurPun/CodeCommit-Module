@@ -55,7 +55,7 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = []
 
       configuration = {
-        FunctionName = aws_lambda_function.delete_codepipeline_lambda.function_name
+        FunctionName = module.delete_codepipeline_lambda.function_name
       }
     }
   }

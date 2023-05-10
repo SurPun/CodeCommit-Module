@@ -14,16 +14,12 @@ module "codecommit_repo" {
 }
 
 // Lambda
-data "archive_file" "lambda_function_payload" {
-  type        = "zip"
-  source_file = "./index.js"
-  output_path = "lambda_function_payload.zip"
-}
+module "delete_codepipeline_lambda" {
+  source = "./modules/lambda"
 
-resource "aws_lambda_function" "delete_codepipeline_lambda" {
   function_name = "delete_codepipeline_lambda"
   handler       = "index.handler"
-  role          = aws_iam_role.lambda_exec_role.arn
+  role_arn      = aws_iam_role.lambda_exec_role.arn
   runtime       = "nodejs14.x"
 
   s3_bucket = aws_s3_bucket.lambda_bucket.bucket
@@ -31,6 +27,11 @@ resource "aws_lambda_function" "delete_codepipeline_lambda" {
 }
 
 // Lambda Bucket
+data "archive_file" "lambda_function_payload" {
+  type        = "zip"
+  source_file = "./modules/lambda/index.js"
+  output_path = "lambda_function_payload.zip"
+}
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "lambda-function-bucket-del"
 }
