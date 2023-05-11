@@ -6,3 +6,7 @@ output "repository_url" {
 output "repository_name" {
   value = aws_codecommit_repository.codecommit_repository.repository_name
 }
+
+output "default_branch" {
+  value = aws_codecommit_repository.codecommit_repository.default_branch
+}

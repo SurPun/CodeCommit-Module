@@ -27,6 +27,17 @@ phases:
       - echo "fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));" >> modify-package-json.js
       - node modify-package-json.js
       - rm modify-package-json.js
+      - touch .gitignore
+      - echo "node_modules" >> .gitignore
+      - echo ".terraform/" >> .gitignore
+      - echo "*.tfstate" >> .gitignore
+      - echo "*.tfstate.backup" >> .gitignore
+      - echo ".aws" >> .gitignore
+      - echo "remote_state.tf" >> .gitignore
+      - echo ".git" >> .gitignore
+      - git add .
+      - git commit -m "Gitignore"
+
   build:
     commands:
       - echo '#!/bin/bash' > .husky/pre-commit
@@ -41,11 +52,9 @@ phases:
       - echo 'fi' >> .husky/pre-commit
       - echo 'This is a CodeCommit Module that uses a CI/CD Pipeline to pre-install and push the necessary files to protect the main branch.' > readme.md
       - echo '' >> readme.md
-      - echo '[Instructions](https://github.com/SurPun/CodeCommit-Module/blob/main/Instructions.md)' >> readme.md
-      - echo '' >> readme.md
       - echo 'Please run `npm install` then `npm run prepare` command in the terminal to protect the main branch.' >> readme.md
       - git add .
-      - git commit -m "CI/CD Commit"
+      - git commit -m "CI/CD Commit & Gitignore"
   post_build:
     commands:
       - git push origin main
